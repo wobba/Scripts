@@ -14,20 +14,23 @@
 						}
 					}
 					var searchBox = scriptManager.queryGroups["Default"].searchBoxes[0];
-					searchBox.set_showNavigation(false);
+					//searchBox.set_showNavigation(false);
 				});
 			}
 		});
 	}
+	
 	ExecuteOrDelayUntilBodyLoaded(function() {
-		if (typeof (_spBodyOnLoadCalled) === 'undefined' || _spBodyOnLoadCalled) {
-			// make sure we are called after the controls are initialized, but before rendered
-			Sys.Application.add_init(hideSettingsElementsOSSSearchResults);
-			RegisterModuleInit(SP.Utilities.UrlBuilder.urlCombine(_spPageContextInfo.webServerRelativeUrl,'SiteAssets/mAdcOW.OSSSearchResultOverride.js'), hideSettingsElementsOSSSearchResults);
-		}
-		else {
-			// make sure we are called after the controls are initialized, but before rendered
-			Sys.Application.add_init(hideSettingsElementsOSSSearchResults);
-		}
+		try{
+			if (typeof (_spBodyOnLoadCalled) === 'undefined' || _spBodyOnLoadCalled) {
+				// make sure we are called after the controls are initialized, but before rendered
+				Sys.Application.add_init(hideSettingsElementsOSSSearchResults);
+				RegisterModuleInit(SP.Utilities.UrlBuilder.urlCombine(_spPageContextInfo.webServerRelativeUrl,'SiteAssets/mAdcOW.OSSSearchResultOverride.js'), hideSettingsElementsOSSSearchResults);
+			}
+			else {
+				// make sure we are called after the controls are initialized, but before rendered
+				Sys.Application.add_init(hideSettingsElementsOSSSearchResults);
+			}
+		} catch(e) {}
 	});
 }());
