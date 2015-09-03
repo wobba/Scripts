@@ -5,7 +5,9 @@
 			if (window.location.href.toLowerCase().indexOf("osssearchresults") != -1) {
 				SP.SOD.executeFunc("search.clientcontrols.js", "Srch.ScriptApplicationManager", function() {
 					var scriptManager = Srch.ScriptApplicationManager.get_current();
-					var searchControls = scriptManager.queryGroups["Default"].displays;
+					var queryGroup = scriptManager.queryGroups["Default"];
+                			queryGroup.dataProvider.set_resultsPerPage(30); // set page to show 30 items per page
+        				var searchControls = queryGroup.displays;
 					for (var i = 0; i < searchControls.length; i++) {
 						if (searchControls[i] instanceof Srch.Result) {
 							searchControls[i].set_showUpScopeMessage(false);
