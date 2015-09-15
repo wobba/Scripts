@@ -1,7 +1,8 @@
 param (
 	[Parameter(Mandatory=$True)]
 	[string]$SiteUrl='https://<yourtentant>.sharepoint.com/sites/<yoursite>',
-	[string]$SchemaPath = './VSDXSearchConfiguration.xml'
+	[string]$SchemaPath = './VSDXSearchConfiguration.xml',
+	[switch]$SPOAuth
 )
 
 [System.Reflection.Assembly]::LoadWithPartialName("Microsoft.SharePoint.Client") | Out-Null
@@ -11,6 +12,10 @@ param (
 
 Function Get-SPOCredentials([string]$UserName,[string]$Password)
 {
+   if([string]::IsNullOrEmpty($UserName)) {
+	  $UserName = Read-Host -Prompt "Enter the username"
+   }
+
    if([string]::IsNullOrEmpty($Password)) {
       $SecurePassword = Read-Host -Prompt "Enter the password" -AsSecureString 
    }
@@ -72,8 +77,6 @@ Function Upload-FileToSiteAssets([Microsoft.SharePoint.Client.ClientContext]$Con
     $Context.ExecuteQuery();
 	$fileUrl = $list.RootFolder.ServerRelativeUrl + '/' + $FileName;
 	
-	#$fi = new-Object IO.FileInfo $FileName
-
 	$scriptPath = Split-Path -Parent $PSCommandPath
 	$fs = New-Object IO.FileStream "$scriptPath/$FileName", 'Open'
 	[Microsoft.SharePoint.Client.File]::SaveBinaryDirect($Context, $fileUrl, $fs, $true)
@@ -83,7 +86,9 @@ Function Upload-FileToSiteAssets([Microsoft.SharePoint.Client.ClientContext]$Con
 
 $context = New-Object Microsoft.SharePoint.Client.ClientContext($SiteUrl)
 # SPO credentials
-#$context.Credentials = Get-SPOCredentials -UserName mikael.svenson@puzzlepart.com
+if( $SPOAuth.IsPresent ) {
+	$context.Credentials = Get-SPOCredentials
+}
 # Use ~SiteCollection if you uploaded to the root site 
 $scriptUrl = '~SiteCollection/SiteAssets/mAdcOW.VisioOverride.js'
 
