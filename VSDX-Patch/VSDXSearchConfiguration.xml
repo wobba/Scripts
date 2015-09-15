@@ -1,0 +1,87 @@
+<SearchConfigurationSettings xmlns:i="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://schemas.datacontract.org/2004/07/Microsoft.Office.Server.Search.Portability">
+	<SearchQueryConfigurationSettings>
+		<SearchQueryConfigurationSettings>
+			<BestBets xmlns:d4p1="http://www.microsoft.com/sharepoint/search/KnownTypes/2008/08" />
+			<DefaultSourceId>00000000-0000-0000-0000-000000000000</DefaultSourceId>
+			<DefaultSourceIdSet>true</DefaultSourceIdSet>
+			<DeployToParent>false</DeployToParent>
+			<DisableInheritanceOnImport>false</DisableInheritanceOnImport>
+			<QueryRuleGroups xmlns:d4p1="http://www.microsoft.com/sharepoint/search/KnownTypes/2008/08" />
+			<QueryRules xmlns:d4p1="http://www.microsoft.com/sharepoint/search/KnownTypes/2008/08" />
+			<ResultTypes xmlns:d4p1="http://schemas.datacontract.org/2004/07/Microsoft.Office.Server.Search.Administration">
+				<d4p1:ResultItemType>
+					<d4p1:BuiltIn>false</d4p1:BuiltIn>
+					<d4p1:DisplayProperties>Title,Path,Description,EditorOWSUSER,LastModifiedTime,CollapsingStatus,DocId,HitHighlightedSummary,HitHighlightedProperties,FileExtension,ViewsLifeTime,ParentLink,FileType,IsContainer,SecondaryFileExtension,DisplayAuthor,ServerRedirectedURL</d4p1:DisplayProperties>
+					<d4p1:DisplayTemplateUrl>~sitecollection/_catalogs/masterpage/Display Templates/Search/Item_OfficeDocument.js</d4p1:DisplayTemplateUrl>
+					<d4p1:ID>90</d4p1:ID>
+					<d4p1:InternalID>8db2999b-b2ef-4137-8710-acef85f440b4</d4p1:InternalID>
+					<d4p1:IsDeleted>false</d4p1:IsDeleted>
+					<d4p1:LastModifiedDate>2015-09-15T10:41:34.14</d4p1:LastModifiedDate>
+					<d4p1:Name>Microsoft Visio 2013</d4p1:Name>
+					<d4p1:OptimizeForFrequentUse>true</d4p1:OptimizeForFrequentUse>
+					<d4p1:Owner>
+						<d4p1:DatabaseId>00000000-0000-0000-0000-000000000000</d4p1:DatabaseId>
+						<d4p1:DisableInheritance>false</d4p1:DisableInheritance>
+						<d4p1:SPFarmId>baa1b08f-cbca-4af8-95fe-67ba9526f9b6</d4p1:SPFarmId>
+						<d4p1:SPSiteId>aaa51ff8-9ead-4468-b823-8614716dc9b6</d4p1:SPSiteId>
+						<d4p1:SPSiteSubscriptionId>0c37852b-34d0-418e-91c6-2ac25af4be5b</d4p1:SPSiteSubscriptionId>
+						<d4p1:SPWebId>00000000-0000-0000-0000-000000000000</d4p1:SPWebId>
+					</d4p1:Owner>
+					<d4p1:RulePriority>1</d4p1:RulePriority>
+					<d4p1:Rules>
+						<d4p1:PropertyRules>
+							<d4p1:PropertyRule>
+								<d4p1:PropertyName>FileType</d4p1:PropertyName>
+								<d4p1:PropertyOperator>
+									<d4p1:DescriptionLSID>ManageResultTypes_Conditions_Equals</d4p1:DescriptionLSID>
+									<d4p1:IsFunction>false</d4p1:IsFunction>
+									<d4p1:IsQuoted>true</d4p1:IsQuoted>
+									<d4p1:JoinedByOr>true</d4p1:JoinedByOr>
+									<d4p1:Name i:nil="true" />
+									<d4p1:NameLSID>ResultType_RuleOperator_Equals</d4p1:NameLSID>
+									<d4p1:Representation>=</d4p1:Representation>
+								</d4p1:PropertyOperator>
+								<d4p1:PropertyValues xmlns:d9p1="http://schemas.microsoft.com/2003/10/Serialization/Arrays">
+									<d9p1:string>vsdx</d9p1:string>
+                  <d9p1:string>vssx</d9p1:string>
+                  <d9p1:string>vstx</d9p1:string>
+                  <d9p1:string>vsdm</d9p1:string>
+                  <d9p1:string>vssm</d9p1:string>
+                  <d9p1:string>vstm</d9p1:string>
+								</d4p1:PropertyValues>
+								<d4p1:RuleNameLSID i:nil="true" />
+							</d4p1:PropertyRule>
+						</d4p1:PropertyRules>
+					</d4p1:Rules>
+					<d4p1:SourceID>00000000-0000-0000-0000-000000000000</d4p1:SourceID>
+				</d4p1:ResultItemType>
+			</ResultTypes>
+			<Sources xmlns:d4p1="http://schemas.datacontract.org/2004/07/Microsoft.Office.Server.Search.Administration.Query" />
+			<UserSegments xmlns:d4p1="http://www.microsoft.com/sharepoint/search/KnownTypes/2008/08" />
+		</SearchQueryConfigurationSettings>
+	</SearchQueryConfigurationSettings>
+	<SearchRankingModelConfigurationSettings>
+		<RankingModels xmlns:d3p1="http://schemas.microsoft.com/2003/10/Serialization/Arrays" />
+	</SearchRankingModelConfigurationSettings>
+	<SearchSchemaConfigurationSettings>
+		<Aliases xmlns:d3p1="http://schemas.datacontract.org/2004/07/Microsoft.Office.Server.Search.Administration">
+			<d3p1:LastItemName i:nil="true" />
+			<d3p1:dictionary xmlns:d4p1="http://schemas.microsoft.com/2003/10/Serialization/Arrays" />
+		</Aliases>
+		<CategoriesAndCrawledProperties xmlns:d3p1="http://schemas.microsoft.com/2003/10/Serialization/Arrays" />
+		<CrawledProperties xmlns:d3p1="http://schemas.datacontract.org/2004/07/Microsoft.Office.Server.Search.Administration" i:nil="true" />
+		<ManagedProperties xmlns:d3p1="http://schemas.datacontract.org/2004/07/Microsoft.Office.Server.Search.Administration">
+			<d3p1:LastItemName i:nil="true" />
+			<d3p1:dictionary xmlns:d4p1="http://schemas.microsoft.com/2003/10/Serialization/Arrays" />
+			<d3p1:TotalCount>0</d3p1:TotalCount>
+		</ManagedProperties>
+		<Mappings xmlns:d3p1="http://schemas.datacontract.org/2004/07/Microsoft.Office.Server.Search.Administration">
+			<d3p1:LastItemName i:nil="true" />
+			<d3p1:dictionary xmlns:d4p1="http://schemas.microsoft.com/2003/10/Serialization/Arrays" />
+		</Mappings>
+		<Overrides xmlns:d3p1="http://schemas.datacontract.org/2004/07/Microsoft.Office.Server.Search.Administration">
+			<d3p1:LastItemName i:nil="true" />
+			<d3p1:dictionary xmlns:d4p1="http://schemas.microsoft.com/2003/10/Serialization/Arrays" />
+		</Overrides>
+	</SearchSchemaConfigurationSettings>
+</SearchConfigurationSettings>
