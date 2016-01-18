@@ -6,8 +6,11 @@ Description
 
 Script which hooks into the query execution flow of a page using search web parts to inject custom query variables using JavaScript
 
-<TODO: load of UPA>
-<TODO: synonyms>
+The script requires jQuery to be loaded on the page, and then you can just attach this script on any page with script editor web part,
+content editor web part, custom action or similar.
+
+<TODO: describe load of user variables>
+<TODO: describe synonyms scenarios>
 
 */
 
