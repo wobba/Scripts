@@ -136,6 +136,9 @@ module mAdcOW.Search.VariableInjection {
                     Microsoft.SharePoint.Client.Search.Query.SearchExecutor.prototype.executeQuery = origExecuteQuery;
                     //issue query
                     for (var i = 0; i < dataProviders.length; i++) {
+                        // complete the intercepted event
+                        dataProviders[i].raiseResultReadyEvent(new Srch.ResultEventArgs(dataProviders[i].get_initialQueryState()));
+                        //re-issue query
                         dataProviders[i].issueQuery();
                     }
                 });
