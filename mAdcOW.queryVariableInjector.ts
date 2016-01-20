@@ -14,6 +14,11 @@ Script which hooks into the query execution flow of a page using search web part
 The script requires jQuery to be loaded on the page, and then you can just attach this script on any page with script editor web part,
 content editor web part, custom action or similar.
 
+
+Usecase 1 - Static variables
+----------------------------
+Any variable which is persistant for the user across sessions should be loaded 
+
 <TODO: describe load of user variables>
 <TODO: describe synonyms scenarios>
 
@@ -22,12 +27,47 @@ content editor web part, custom action or similar.
 declare var Srch;
 declare var Sys;
 module mAdcOW.Search.VariableInjection {
-    var loading = false;
-    var userDefinedVariables = {};
-    var synonymTable = {};
-    var dataProviders = [];
+    var _loading = false;
+    var _userDefinedVariables = {};
+    var _synonymTable = {};
+    var _dataProviders = [];
+    var _origExecuteQuery = Microsoft.SharePoint.Client.Search.Query.SearchExecutor.prototype.executeQuery;
+    var _origExecuteQueries = Microsoft.SharePoint.Client.Search.Query.SearchExecutor.prototype.executeQueries;
 
-    // Function to load user variables asynchronous
+    // Function to load synonyms asynchronous - poor mans synonyms
+    function loadSynonyms() {
+        var d = jQuery.Deferred();
+        //simulated logic to fetch and add synonyms - could be from a list
+        setTimeout(() => {
+            _synonymTable['color'] = ['red', 'blue'];
+            _synonymTable['"cool guy"'] = ['"mikael svenson"'];
+            d.resolve();
+        }, 2000);
+        return d.promise();
+    }
+
+    // Function to inject synonyms at run-time
+    function injectSynonyms(query: string, dataProvider) {
+        // Remove complex query parts AND/OR/NOT/ANY/ALL/parenthasis/property queries/exclusions - can probably be improved            
+        var cleanQuery: string = query.replace(/(-\w+)|(-"\w+.*?")|(-?\w+[:=<>]+\w+)|(-?\w+[:=<>]+".*?")|((\w+)?\(.*?\))|(AND)|(OR)|(NOT)/g, '');
+        var queryParts: string[] = cleanQuery.match(/("[^"]+"|[^"\s]+)/g);
+        var expansions: string[] = [];
+
+        if (queryParts) {
+            for (var i = 0; i < queryParts.length; i++) {
+                if (_synonymTable[queryParts[i]]) {
+                    expansions.push.apply(expansions, _synonymTable[queryParts[i]]);
+                }
+            }
+        }
+        if (expansions.length > 0) {
+            dataProvider.get_properties()["mAdcOWSynonyms"] = expansions;
+        } else {
+            delete dataProvider.get_properties()["mAdcOWSynonyms"];
+        }
+    }
+
+    // Sample function to load user variables asynchronous
     function loadUserVariables() {
         var d = jQuery.Deferred();
         SP.SOD.executeFunc('sp.js', 'SP.ClientContext', () => {
@@ -40,9 +80,12 @@ module mAdcOW.Search.VariableInjection {
                 for (var property in user) {
                     if (user.hasOwnProperty(property)) {
                         var val = user[property];
-                        if (typeof val == "number" || typeof val == "string") {
+                        if (typeof val == "number") {
                             console.log(property + " : " + val);
-                            userDefinedVariables["mAdcOWUser." + property] = val;
+                            _userDefinedVariables["mAdcOWUser." + property] = val;
+                        } else if (typeof val == "string") {
+                            console.log(property + " : " + val);
+                            _userDefinedVariables["mAdcOWUser." + property] = val.split(/[\s,]+/);
                         }
                     }
                 }
@@ -55,41 +98,6 @@ module mAdcOW.Search.VariableInjection {
         return d.promise();
     }
 
-    // Function to load synonyms asynchronous - poor mans synonyms
-    function loadSynonyms() {
-        var d = jQuery.Deferred();
-        //logic to fetch and add synonyms - could be from a list
-        setTimeout(() => {
-            synonymTable['color'] = ['red', 'blue'];
-            synonymTable['"cool guy"'] = ['"mikael svenson"'];
-            d.resolve();
-        }, 2000);
-        return d.promise();
-    }
-
-    // Function to inject synonyms at run-time
-    function injectSynonyms(query: string, dataProvider) {
-        // Remove complex query parts AND/OR/NOT/ANY/ALL/parenthasis/property queries/exclusions - can probably be improved            
-        var cleanQuery : string = query.replace(/(-\w+)|(-"\w+.*?")|(-?\w+[:=<>]+\w+)|(-?\w+[:=<>]+".*?")|((\w+)?\(.*?\))|(AND)|(OR)|(NOT)/g, '');
-        var queryParts : string[] = cleanQuery.match(/("[^"]+"|[^"\s]+)/g);
-        var expansions : string[] = [];
-
-        if (queryParts) {
-            for (var i = 0; i < queryParts.length; i++) {
-                if (synonymTable[queryParts[i]]) {
-                    expansions.push.apply(expansions, synonymTable[queryParts[i]]);
-                }
-            }
-        }
-        if (expansions.length > 0) {
-            dataProvider.get_properties()["mAdcOWSynonyms"] = expansions;
-        } else {
-            delete dataProvider.get_properties()["mAdcOWSynonyms"];
-        }
-    }
-
-    
-
     // Function to inject custom variables on page load
     function injectCustomQueryVariables() {
         var queryGroups = Srch.ScriptApplicationManager.get_current().queryGroups;
@@ -98,23 +106,47 @@ module mAdcOW.Search.VariableInjection {
                 var dataProvider = queryGroups[group].dataProvider;
                 var properties = dataProvider.get_properties();
                 // add all user variables fetched and stored as mAdcOWUser.
-                for (var prop in userDefinedVariables) {
-                    if (userDefinedVariables.hasOwnProperty(prop)) {
-                        properties[prop] = userDefinedVariables[prop];
+                for (var prop in _userDefinedVariables) {
+                    if (_userDefinedVariables.hasOwnProperty(prop)) {
+                        properties[prop] = _userDefinedVariables[prop];
                     }
                 }
 
-                // add some custom variables
+                // add some custom variables for show
                 dataProvider.get_properties()["awesomeness"] = "WOOOOOOT";
                 dataProvider.get_properties()["moreawesomeness"] = ["foo", "bar"];
 
                 // set hook for query time variables which can change
                 dataProvider.add_queryIssuing((sender, e) => {
+                    // code which should modify the current query based on context for each new query
                     injectSynonyms(e.queryState.k, sender);
                 });
 
-                dataProviders.push(dataProvider);
+                _dataProviders.push(dataProvider);
             }
+        }
+    }
+
+    function loadDataAndSearch() {
+        if (!_loading) {
+            _loading = true;
+            // run all async code needed to pull in data for variables
+            jQuery.when(loadSynonyms(), loadUserVariables()).done(() => {
+                // set loaded data as custom query variables
+                injectCustomQueryVariables();
+                
+                //reset to original function
+                Microsoft.SharePoint.Client.Search.Query.SearchExecutor.prototype.executeQuery = _origExecuteQuery;
+                Microsoft.SharePoint.Client.Search.Query.SearchExecutor.prototype.executeQueries = _origExecuteQueries;
+                
+                //re-issue query for the search web parts
+                for (var i = 0; i < _dataProviders.length; i++) {
+                    // complete the intercepted event
+                    _dataProviders[i].raiseResultReadyEvent(new Srch.ResultEventArgs(_dataProviders[i].get_initialQueryState()));
+                    //re-issue query
+                    _dataProviders[i].issueQuery();
+                }
+            });
         }
     }
 
@@ -123,44 +155,15 @@ module mAdcOW.Search.VariableInjection {
         console.log("Hooking variable injection");
 
         //TODO: Check if we have cached data, if so, no need to intercept for async web parts
-
-        var origExecuteQuery = Microsoft.SharePoint.Client.Search.Query.SearchExecutor.prototype.executeQuery;
-        var origExecuteQueries = Microsoft.SharePoint.Client.Search.Query.SearchExecutor.prototype.executeQueries;
+        // Override both executeQuery and executeQueries
 
         Microsoft.SharePoint.Client.Search.Query.SearchExecutor.prototype.executeQuery = (query : Microsoft.SharePoint.Client.Search.Query.Query) => {
-            if (!loading) {
-                loading = true;
-                jQuery.when(loadSynonyms(), loadUserVariables()).done(() => {
-                    injectCustomQueryVariables();
-                    //reset to original function
-                    Microsoft.SharePoint.Client.Search.Query.SearchExecutor.prototype.executeQuery = origExecuteQuery;
-                    //issue query
-                    for (var i = 0; i < dataProviders.length; i++) {
-                        // complete the intercepted event
-                        dataProviders[i].raiseResultReadyEvent(new Srch.ResultEventArgs(dataProviders[i].get_initialQueryState()));
-                        //re-issue query
-                        dataProviders[i].issueQuery();
-                    }
-                });
-            }
+            loadDataAndSearch();
             return new SP.JsonObjectResult();
         }
 
         Microsoft.SharePoint.Client.Search.Query.SearchExecutor.prototype.executeQueries = (queryIds: string[], queries: Microsoft.SharePoint.Client.Search.Query.Query[], handleExceptions: boolean) => {
-            if (!loading) {
-                loading = true;
-                jQuery.when(loadSynonyms(), loadUserVariables()).done(() => {
-                    injectCustomQueryVariables();
-                    //reset to original function
-                    Microsoft.SharePoint.Client.Search.Query.SearchExecutor.prototype.executeQueries = origExecuteQueries;
-                    for (var i = 0; i < dataProviders.length; i++) {
-                        // complete the intercepted event
-                        dataProviders[i].raiseResultReadyEvent(new Srch.ResultEventArgs(dataProviders[i].get_initialQueryState()));
-                        //re-issue query
-                        dataProviders[i].issueQuery();
-                    }
-                });
-            }
+            loadDataAndSearch();
             return new SP.JsonObjectResult();
         }
     }
