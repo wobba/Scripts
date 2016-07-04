@@ -30,9 +30,9 @@
                 // search result web part
             }
         }
-
-        ExecuteOrDelayUntilBodyLoaded(function () {
-            Sys.Application.add_init(hookScript);
-        });
     }
+
+    ExecuteOrDelayUntilBodyLoaded(function () {
+        Sys.Application.add_init(hookScript);
+    });
 }());
